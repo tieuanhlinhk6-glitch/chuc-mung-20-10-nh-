@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chúc mừng 20/10</title>
+  <style>
+    :root{ --bg:#fff0f6; --card:#ffffff; --accent:#ff6fa3; --muted:#6b6b6b; --shadow: 0 10px 30px rgba(0,0,0,0.08); font-family: 'Helvetica Neue', Arial, sans-serif; }
+    html,body{height:100%;margin:0}
+    body{ background: radial-gradient(circle at 10% 10%, #fff7fb 0%, var(--bg) 30%), linear-gradient(180deg,#fff,#fff6fb); display:flex;align-items:center;justify-content:center; padding:32px; }
+    .card{ width:min(920px,95%); background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:32px; position:relative; overflow:hidden; display:grid; grid-template-columns: 1fr 340px; gap:24px; align-items:center; transition:opacity .4s ease, transform .4s ease; }
+    h1{margin:0 0 12px 0;color:var(--accent);font-size:38px;letter-spacing:0.4px}
+    p.lead{margin:0 0 18px 0;color:#333;font-size:16px;line-height:1.6}
+    .aside{background: linear-gradient(180deg,#fff0f9,#fff);border-radius:12px;padding:18px;box-shadow: 0 6px 18px rgba(0,0,0,0.04);text-align:center}
+    .flower img{width:100%;height:220px;object-fit:cover;border-radius:10px}
+    footer{position:absolute;left:24px;right:24px;bottom:18px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    .heart{position:absolute;pointer-events:none;transform:translate(-50%,-50%);will-change:transform,opacity;opacity:0.9;font-size:24px;z-index:101;}
+    /* Intro envelope */
+    #intro{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#ffe6f2;z-index:99}
+    #envelope{width:320px;height:220px;position:relative;cursor:pointer;perspective:900px}
+    #env-body{position:absolute;inset:0;background:linear-gradient(135deg,#ffc5dc,#ff9fc8);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,0.18);overflow:hidden}
+    #envelope-lid{position:absolute;left:0;right:0;top:0;height:60%;background:linear-gradient(135deg,#ff96c6,#ff7eb3);border-radius:14px 14px 0 0;transform-origin:top center;transition:transform 0.6s ease;clip-path:polygon(0 0,100% 0,50% 100%);box-shadow:0 6px 16px rgba(0,0,0,0.15)}
+    #env-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;color:white;font-weight:700;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2))}
+    #letter{position:absolute;left:50%;top:60%;width:86%;transform:translate(-50%,120%);background:linear-gradient(180deg,#fff,#fffaf6);border-radius:10px;padding:20px;box-shadow:0 18px 40px rgba(0,0,0,0.12);transition:transform 0.8s cubic-bezier(.2,.9,.3,1),opacity 0.5s;opacity:0}
+    #letter.show{transform:translate(-50%,0%);opacity:1}
+    
+    /* New card for the final message */
+    #finalCard{ 
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,0.95);
+      z-index:100;
+      padding:20px;
+      box-sizing:border-box;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.6s ease;
+    }
+    #finalCard.visible{
+      opacity:1;
+      pointer-events:auto;
+    }
+    #finalCard .content{
+      background:white;
+      border-radius:20px;
+      padding:30px;
+      max-width:90%;
+      max-height:90vh;
+      overflow-y:auto;
+      box-shadow:0 10px 30px rgba(0,0,0,0.1);
+      text-align:center;
+    }
+    #finalCard h2{
+      color:var(--accent);
+      font-size:36px;
+      margin:0 0 10px 0;
+      line-height:1.2;
+    }
+    #finalCard p{
+      color:#333;
+      font-size:16px;
+      line-height:1.6;
+      margin:15px 0;
+      text-align:left;
+    }
+    #finalCard .signature{
+      color:var(--muted);
+      font-size:14px;
+      margin-top:20px;
+      font-style:italic;
+    }
+    #finalCard .hearts{
+      display:flex;
+      justify-content:space-around;
+      margin-top:20px;
+    }
+    #finalCard .heart-icon{
+      font-size:24px;
+      color:#ff6fa3;
+    }
+    @media (max-width:820px){.card{grid-template-columns:1fr}.aside{order:-1}#envelope{width:260px;height:170px}#env-mark{font-size:22px}}
+  </style>
+</head>
+<body>
+  <div id="intro">
+    <div id="envelope" aria-label="Bấm để mở thư">
+      <div id="env-body"></div>
+      <div id="envelope-lid"></div>
+      <div id="env-mark">💌</div>
+      <div id="letter" role="region" aria-label="Thư chúc mừng">
+        <h2 style="margin-top:0;color:var(--accent)">Chúc mừng 20/10 🌸</h2>
+        <p id="typeText" style="margin:0 0 8px 0;color:#333"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final card that appears after second click -->
+  <div id="finalCard">
+    <div class="content">
+      <div style="text-align:center;">
+        <h2>Chúc mừng 20/10 🌸</h2>
+        <p id="finalMessage" style="text-align:left;"></p>
+        <div class="signature">From IHME Boi</div>
+        <div class="hearts">
+          <span class="heart-icon">💗</span>
+          <span class="heart-icon">💖</span>
+          <span class="heart-icon">💕</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" role="main" id="card" style="opacity:0;transform:translateY(20px);display:grid;">
+    <div>
+      <h1>Chúc mừng 20/10 🌸</h1>
+      <p class="lead" id="lead1">Nhân ngày Phụ nữ Việt Nam 20/10, xin gửi lời chúc xinh đẹp, hạnh phúc và rực rỡ nhất đến tất cả các cậu. Cảm ơn vì đã luôn là những bông hoa thật đẹp trong hành trình học tập này.</p>
+      <p class="lead" id="lead2">Chúc các cậu luôn giữ nụ cười thật tươi, thật rạng rỡ, gặp nhiều may mắn và thành công trong mọi dự định của bản thân. Mong rằng hôm nay sẽ là một ngày đáng nhớ và ngập tràn yêu thương dành cho các cậu 💕</p>
+    </div>
+
+    <aside class="aside">
+      <div class="flower">
+        <img id="insertedPhoto" src="" alt="" style="width:100%;height:220px;object-fit:cover;border-radius:10px;display:none;"/>
+      </div>
+      <p style="margin:0;color:var(--muted);font-size:13px">From IHME Boi</p>
+    </aside>
+  </div>
+
+  <!-- Audio element - Đảm bảo bạn upload file nhac-chill.mp3 cùng thư mục -->
+  <audio id="bgm" src="nhac-chill.mp3" preload="auto" loop crossorigin="anonymous"></audio>
+
+  <script>
+  (function(){
+    const body = document.body;
+    let heartsInterval = null;
+    let envelopeStage = 0; // 0 closed, 1 lifted, 2 opened
+    let firstClickDone = false;
+
+    function spawnHeart(){
+      const h = document.createElement('div'); 
+      h.className='heart';
+      
+      // Random heart types for variety
+      const heartTypes = ['💗', '💖', '💕', '💓', '💝'];
+      const randomHeart = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+      h.innerText = randomHeart;
+      
+      // Larger and more visible hearts
+      const size = 24 + Math.random() * 16; // 24px to 40px
+      h.style.fontSize = size + 'px';
+      h.style.color = '#ff6fa3';
+      h.style.textShadow = '0 2px 8px rgba(255, 111, 163, 0.4)';
+      
+      // Random position across the entire screen width
+      const x = Math.random() * 100;
+      h.style.left = x + '%';
+      h.style.bottom = '-50px'; // Start from bottom
+      
+      body.appendChild(h);
+      
+      // Enhanced animation with more dramatic movement
+      const rise = 60 + Math.random() * 40; // 60vh to 100vh
+      const rotate = (Math.random() * 120 - 60); // -60 to +60 degrees
+      const duration = 3000 + Math.random() * 2000; // 3-5 seconds
+      
+      const anim = h.animate([
+        { 
+          transform: 'translate(-50%, 0) scale(0.8) rotate(0deg)', 
+          opacity: 0.7,
+          filter: 'blur(0px)'
+        },
+        { 
+          transform: `translate(-50%, -${rise}vh) scale(1.2) rotate(${rotate}deg)`, 
+          opacity: 0,
+          filter: 'blur(2px)'
+        }
+      ], { 
+        duration: duration, 
+        easing: 'cubic-bezier(0.2, 0.8, 0.4, 1)',
+        fill: 'forwards'
+      });
+      
+      anim.onfinish = () => h.remove();
+    }
+
+    // safe audio play
+    function tryPlayBgm(){
+      const bgm = document.getElementById('bgm'); if(!bgm) return;
+      try{ if(!bgm.paused){ bgm.currentTime = 0; return; } }catch(e){ console.warn('bgm check paused failed', e); }
+      if(bgm.readyState >= 3){ bgm.currentTime = 0; bgm.play().catch(e=>console.warn('bgm play failed',e)); return; }
+      const onCan = ()=>{ bgm.removeEventListener('canplaythrough', onCan); bgm.currentTime = 0; bgm.play().catch(e=>console.warn('bgm play failed after canplaythrough',e)); };
+      const onError = (ev)=>{ console.warn('bgm load error', ev); bgm.removeEventListener('error', onError); bgm.removeEventListener('canplaythrough', onCan); };
+      bgm.addEventListener('canplaythrough', onCan); bgm.addEventListener('error', onError);
+      // fallback: try after small delay
+      setTimeout(()=>{ bgm.play().catch(()=>{}); }, 1500);
+    }
+
+    // TYPEWRITER
+    function typeWriter(text, element, speed = 60, onDone){ 
+      element.innerHTML=''; 
+      let i=0; 
+      (function typing(){ 
+        if(i<text.length){ 
+          element.innerHTML += text.charAt(i); 
+          i++; 
+          setTimeout(typing, speed); 
+        } else { 
+          if(typeof onDone==='function') onDone(); 
+        } 
+      })(); 
+    }
+
+    function revealCard(){ 
+      const card = document.getElementById('card'); 
+      if(!card) return; 
+      card.style.opacity='1'; 
+      card.style.transform='translateY(0)'; 
+      if(!heartsInterval) heartsInterval = setInterval(spawnHeart, 400); // More frequent hearts
+    }
+
+    function resetEnvelope(){ 
+      const lid=document.getElementById('envelope-lid'); 
+      const letter=document.getElementById('letter'); 
+      if(lid) lid.style.transform='rotateX(0deg)'; 
+      if(letter) letter.classList.remove('show'); 
+      const intro=document.getElementById('intro'); 
+      if(intro) intro.style.display='flex'; 
+      envelopeStage = 0; 
+    }
+
+    // Show final card with typewriter effect
+    function showFinalCard() {
+      const finalCard = document.getElementById('finalCard');
+      const finalMessage = document.getElementById('finalMessage');
+      
+      if(!finalCard || !finalMessage) return;
+      
+      // Reset the final card
+      finalMessage.innerHTML = '';
+      finalCard.classList.add('visible');
+      
+      // Start typewriter effect for final message
+      const fullMessage = "Nhân ngày Phụ nữ Việt Nam 20/10, xin gửi lời chúc xinh đẹp, hạnh phúc và rực rỡ nhất đến tất cả các cậu. Cảm ơn vì đã luôn là những bông hoa thật đẹp trong hành trình học tập này.\n\nChúc các cậu luôn giữ nụ cười thật tươi, thật rạng rỡ, gặp nhiều may mắn và thành công trong mọi dự định của bản thân. Mong rằng hôm nay sẽ là một ngày đáng nhớ và ngập tràn yêu thương dành cho các cậu 💕";
+      
+      typeWriter(fullMessage, finalMessage, 40, () => {
+        // After typing, start hearts and music
+        if(!heartsInterval) heartsInterval = setInterval(spawnHeart, 400);
+        tryPlayBgm();
+      });
+    }
+
+    // Fixed openEnvelope function for two clicks
+    function openEnvelope(){
+      const lid = document.getElementById('envelope-lid');
+      const letter = document.getElementById('letter');
+      const intro = document.getElementById('intro');
+      const typeText = document.getElementById('typeText');
+      
+      if(!lid || !letter || !intro || !typeText) return;
+      
+      if (!firstClickDone) {
+        // First click: show the letter
+        lid.style.transform = 'rotateX(-160deg)';
+        envelopeStage = 1;
+        
+        setTimeout(() => {
+          lid.style.transform = 'rotateX(180deg)';
+          letter.classList.add('show');
+          envelopeStage = 2;
+          
+          // Type out a short message in the letter
+          const firstMessage = "Bấm lần nữa để xem lời chúc đặc biệt!";
+          typeWriter(firstMessage, typeText, 60, () => {
+            firstClickDone = true;
+          });
+        }, 600);
+      } else {
+        // Second click: hide envelope and show final card
+        lid.style.transform = 'rotateX(180deg)';
+        letter.classList.remove('show');
+        
+        setTimeout(() => {
+          intro.style.transition = 'opacity 0.8s ease';
+          intro.style.opacity = '0';
+          setTimeout(() => {
+            intro.style.display = 'none';
+            showFinalCard();
+          }, 800);
+        }, 300);
+      }
+    }
+
+    // Add click event listener to envelope
+    const envelope = document.getElementById('envelope');
+    if(envelope) {
+      envelope.addEventListener('click', function() {
+        if(envelopeStage === 0 || firstClickDone) {
+          openEnvelope();
+        }
+      });
+    }
+
+    // Initialize - ensure envelope is clickable
+    console.log('Envelope initialized and ready to open!');
+  })();
+  </script>
+</body>
+</html>
