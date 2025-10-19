@@ -137,6 +137,7 @@
     let heartsInterval = null;
     let envelopeStage = 0; // 0 closed, 1 lifted, 2 opened
     let firstClickDone = false;
+    let musicPlayed = false; // Track if music has been played
 
     function spawnHeart(){
       const h = document.createElement('div'); 
@@ -187,14 +188,15 @@
 
     // safe audio play
     function tryPlayBgm(){
+      if (musicPlayed) return; // Don't play music again if already played
       const bgm = document.getElementById('bgm'); if(!bgm) return;
-      try{ if(!bgm.paused){ bgm.currentTime = 0; return; } }catch(e){ console.warn('bgm check paused failed', e); }
-      if(bgm.readyState >= 3){ bgm.currentTime = 0; bgm.play().catch(e=>console.warn('bgm play failed',e)); return; }
-      const onCan = ()=>{ bgm.removeEventListener('canplaythrough', onCan); bgm.currentTime = 0; bgm.play().catch(e=>console.warn('bgm play failed after canplaythrough',e)); };
+      try{ if(!bgm.paused){ bgm.currentTime = 0; musicPlayed = true; return; } }catch(e){ console.warn('bgm check paused failed', e); }
+      if(bgm.readyState >= 3){ bgm.currentTime = 0; bgm.play().then(() => { musicPlayed = true; }).catch(e=>console.warn('bgm play failed',e)); return; }
+      const onCan = ()=>{ bgm.removeEventListener('canplaythrough', onCan); bgm.currentTime = 0; bgm.play().then(() => { musicPlayed = true; }).catch(e=>console.warn('bgm play failed after canplaythrough',e)); };
       const onError = (ev)=>{ console.warn('bgm load error', ev); bgm.removeEventListener('error', onError); bgm.removeEventListener('canplaythrough', onCan); };
       bgm.addEventListener('canplaythrough', onCan); bgm.addEventListener('error', onError);
       // fallback: try after small delay
-      setTimeout(()=>{ bgm.play().catch(()=>{}); }, 1500);
+      setTimeout(()=>{ bgm.play().then(() => { musicPlayed = true; }).catch(()=>{}); }, 1500);
     }
 
     // TYPEWRITER
@@ -228,6 +230,8 @@
       const intro=document.getElementById('intro'); 
       if(intro) intro.style.display='flex'; 
       envelopeStage = 0; 
+      firstClickDone = false;
+      musicPlayed = false;
     }
 
     // Show final card with typewriter effect
@@ -245,13 +249,12 @@
       const fullMessage = "Nhân ngày Phụ nữ Việt Nam 20/10, xin gửi lời chúc xinh đẹp, hạnh phúc và rực rỡ nhất đến tất cả các cậu. Cảm ơn vì đã luôn là những bông hoa thật đẹp trong hành trình học tập này.\n\nChúc các cậu luôn giữ nụ cười thật tươi, thật rạng rỡ, gặp nhiều may mắn và thành công trong mọi dự định của bản thân. Mong rằng hôm nay sẽ là một ngày đáng nhớ và ngập tràn yêu thương dành cho các cậu 💕";
       
       typeWriter(fullMessage, finalMessage, 40, () => {
-        // After typing, start hearts and music
+        // After typing, start hearts
         if(!heartsInterval) heartsInterval = setInterval(spawnHeart, 400);
-        tryPlayBgm();
       });
     }
 
-    // Fixed openEnvelope function for two clicks
+    // Fixed openEnvelope function for two clicks - MUSIC PLAYS ON FIRST CLICK
     function openEnvelope(){
       const lid = document.getElementById('envelope-lid');
       const letter = document.getElementById('letter');
@@ -261,9 +264,12 @@
       if(!lid || !letter || !intro || !typeText) return;
       
       if (!firstClickDone) {
-        // First click: show the letter
+        // First click: show the letter AND play music immediately
         lid.style.transform = 'rotateX(-160deg)';
         envelopeStage = 1;
+        
+        // Play music on first click
+        tryPlayBgm();
         
         setTimeout(() => {
           lid.style.transform = 'rotateX(180deg)';
